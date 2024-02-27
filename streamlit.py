@@ -218,6 +218,40 @@ def agree_tran(df, state):
      st.plotly_chart(fig_pie_2)
 
 
+def agree_user(df, year): 
+    
+    plot = df[df["years"] == year]
+    plot.reset_index(drop=True, inplace=True)
+
+    graph =pd.DataFrame( plot.groupby("brand")[["count"]].sum())
+    graph.reset_index(inplace=True)
+
+    fig_pie_1 = px.bar(graph, x="brand", y="count",title=f"{year} BRAND AND TRANSACTION COUNT",
+                      width=600, color_discrete_sequence=px.colors.sequential.Aggrnyl,hover_data="brand")
+    st.plotly_chart(fig_pie_1)
+
+
+    return plot
+
+
+def agree_user1(df,quarter):
+    
+    plot = df[df["quarter"] == quarter]
+    plot.reset_index(drop=True, inplace=True)
+ 
+    graph =pd.DataFrame( plot.groupby("brand")[["count"]].sum())
+    graph.reset_index(inplace=True)
+    
+
+    fig_pie_1 = px.bar(graph, x="brand", y="count",title=f"{quarter} QUARTER BRAND AND TRANSACTION COUNT",
+                      width=600, color_discrete_sequence=px.colors.sequential.Aggrnyl)
+    st.plotly_chart(fig_pie_1)
+
+    return plot
+
+
+
+
 #streamlit
 st.set_page_config (
     page_title="PHONPE",
@@ -273,16 +307,34 @@ elif selected == "DATA EXPLORATION":
              
               col1,col2=st.columns(2)
               with col1:
-               years=st.slider("select the year",AGGREAGATED_TRANSACTION["years"].min(),AGGREAGATED_TRANSACTION["years"].max(),AGGREAGATED_TRANSACTION["years"].min())
-              result1=Transaction_amount_count_y(AGGREAGATED_TRANSACTION,years)
+               year1=st.slider("select the year",AGGREAGATED_TRANSACTION["years"].min(),AGGREAGATED_TRANSACTION["years"].max(),AGGREAGATED_TRANSACTION["years"].min())
+              result1=Transaction_amount_count_y(AGGREAGATED_TRANSACTION,year1)
             
               col1,col2=st.columns(2)
               with col1:
-                  states=st.selectbox("select the states",result1["states"].unique())
-              agree_tran(result1, states)     
+                  states1=st.selectbox("select the states",result1["states"].unique())
+              agree_tran(result1, states1)     
+
 
         elif method == "USER ANALYSIS":
-            pass
+           col1, col2 = st.columns(2)
+
+           with col1:
+              brand = st.slider("Select the Year", AGGREAGATED_USER["years"].min(),
+                      AGGREAGATED_USER["years"].max(), AGGREAGATED_USER["years"].min())
+              result2 =agree_user(AGGREAGATED_USER, brand)
+
+        
+              col1,col2=st.columns(2)
+              with col2:
+
+                quarters=st.slider("select the quater",result2["quarter"].min(),result2["quarter"].max(),result2["quarter"].min())
+
+              agreegate=agree_user1(result2,quarters)   
+
+
+  
+
     with tab2:
         method=st.selectbox("select the Method",[" MAP INSURANCE","MAP TRANSACTION"," MAP USER"])
 
